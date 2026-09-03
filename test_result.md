@@ -102,7 +102,53 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the updated admin/user auth + OTP + permissions backend for the Factory Order Management app"
+user_problem_statement: "Estimates page changes: (1) bump app version to 1.0.1, (2) show GST tax row on the generated/printed estimate between the subtotal (Line total) and Bill amount, (3) remove placeholder strings ('Pick a customer...' subtitle, 'facedook' branding) from the Estimates/app."
+
+frontend:
+  - task: "Estimate slip shows GST 18% row between Line total and Bill amount"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Estimates.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Backend already returns totals.gst (gst = round(bill_amount*18/118)). The generated/printed estimate slip previously showed only Bill amount / Cash / Grand total (no GST). Added a 'GST 18%' row (data-testid='estimate-gst-total') as the FIRST row of the totals box, i.e. right after the table's 'Line total' subtotal and before 'Bill amount'. TEST: login admin@factory.com/admin123, go to Estimates, pick a customer, add a SKU with qty, enter a Bill amount (e.g. 1180), click Generate estimate; verify the result slip shows the GST 18% row with a non-zero value between Line total and Bill amount."
+  - task: "App version shows 1.0.1 in Admin Settings"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminSettings.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Changed APP_VERSION from '1.0' to '1.0.1'. TEST: open Admin Settings, verify version badge (data-testid='app-version-badge') reads v1.0.1."
+  - task: "Remove 'Pick a customer...' subtitle from Estimates header"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Estimates.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Deleted the subtitle paragraph 'Pick a customer and add SKUs & quantities — the system pulls their price list and computes the bill and cash breakdown automatically.' from the Estimates page header. TEST: Estimates page no longer shows that sentence."
+  - task: "Rebrand 'facedook' placeholder to 'JK Products'"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/public/index.html"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Replaced 'facedook' in index.html (title + meta), manifest.json, and InstallPrompt.jsx with 'JK Products'. NOTE: 'https://app.emergent.sh/chat' was NOT found anywhere in the source code — cannot delete a string that does not exist; likely a browser print-footer URL. TEST: document.title is 'JK Products'."
 
 backend:
   - task: "Admin login with OTP (step 1)"
@@ -236,11 +282,17 @@ metadata:
   last_tested: "2026-08-08T13:25:00Z"
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Estimate slip shows GST 18% row between Line total and Bill amount"
+    - "App version shows 1.0.1 in Admin Settings"
+    - "Remove 'Pick a customer...' subtitle from Estimates header"
+    - "Rebrand 'facedook' placeholder to 'JK Products'"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "main"
+    message: "Please verify the 4 new FRONTEND tasks (Estimates GST row is the primary bug). Login: admin@factory.com / admin123 (OTP disabled → direct token). Steps: (1) Go to Estimates, confirm the old subtitle 'Pick a customer and add SKUs...' is GONE. (2) Pick any customer, add one SKU row with a quantity, set Bill amount to 1180, click 'Generate estimate'. In the printed slip (data-testid=estimate-result) confirm a 'GST 18%' row (data-testid=estimate-gst-total) appears AFTER the 'Line total' subtotal and BEFORE 'Bill amount', showing a non-zero value (~180 for 1180). (3) Open Admin Settings and confirm version badge (data-testid=app-version-badge) shows v1.0.1. (4) Confirm document.title === 'JK Products'. Note: 'https://app.emergent.sh/chat' is not present anywhere in source."
   - agent: "testing"
     message: "Completed comprehensive backend testing of auth + OTP + permissions features. All 8 test cases passed successfully. Note: Had to reset admin and user passwords in database as they were not matching expected values (admin123/user123). Also reset user's otp_login back to false to match seeded state. Test credentials documented in /app/memory/test_credentials.md. Backend test script available at /app/backend_test.py for future regression testing."

@@ -295,10 +295,6 @@ export default function Estimates() {
           <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">
             Estimates
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Pick a customer and add SKUs &amp; quantities — the system pulls their price list
-            and computes the bill and cash breakdown automatically.
-          </p>
         </div>
         {view === "new" && estimate && (
           <div className="flex items-center gap-2 print:hidden">
@@ -947,6 +943,15 @@ export default function Estimates() {
 
           <div className="mt-5 flex flex-wrap items-start gap-3">
             <div className="inline-block border-2 border-slate-400 rounded-sm divide-y divide-slate-300 min-w-[240px]">
+              <div className="px-3 py-2 flex items-center justify-between gap-6">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                  GST 18%
+                </span>
+                <span className="tabular-nums font-bold text-slate-900"
+                      data-testid="estimate-gst-total">
+                  ₹{Math.round(estimate.totals.gst || 0).toLocaleString("en-IN")}/-
+                </span>
+              </div>
               <div className="px-3 py-2 flex items-center justify-between gap-6">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                   Bill amount
